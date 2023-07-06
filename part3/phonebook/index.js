@@ -13,7 +13,7 @@ app.use(express.json());
 app.use(cors());
 app.use(express.static("build"));
 
-morgan.token("body", function (request, response) {
+morgan.token("body", function (request) {
   return JSON.stringify(request.body);
 });
 
@@ -21,7 +21,7 @@ app.get("/", (request, response) => {
   response.send("<h1>Hello Alex!</h1>");
 });
 
-app.get("/api/persons", (request, response, next) => {
+app.get("/api/persons", (request, response) => {
   Person.find({}).then((persons) => {
     response.json(persons);
   });
@@ -33,7 +33,7 @@ app.get("/api/persons", (request, response, next) => {
 //   return maxId + 1;
 // };
 
-app.get("/info", (request, response) => {
+app.get("/info", (request, response, next) => {
   Person.countDocuments()
     .then((count) => {
       response.send(`<p>Phonebook has info for ${count}</p>
@@ -56,21 +56,21 @@ app.get("/api/persons/:id", (request, response, next) => {
 
 app.delete("/api/persons/:id", (request, response, next) => {
   Person.findByIdAndDelete(request.params.id)
-    .then((result) => {
+    .then(() => {
       response.status(204).end();
     })
     .catch((error) => next(error));
 });
 
-const generateId = () => {
-  const maxId = persons.length > 0 ? Math.max(...persons.map((n) => n.id)) : 0;
+// const generateId = () => {
+//   const maxId = persons.length > 0 ? Math.max(...persons.map((n) => n.id)) : 0;
 
-  return maxId + 1;
-};
+//   return maxId + 1;
+// };
 
-function getRandomInt(max) {
-  return Math.floor(Math.random() * max);
-}
+// function getRandomInt(max) {
+//   return Math.floor(Math.random() * max);
+// }
 
 app.post("/api/persons", (request, response, next) => {
   const body = request.body;
